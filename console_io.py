@@ -1,8 +1,6 @@
 class ConsoleIO:
     @staticmethod
-    def get_input():
-        return input("Please input the position you want to mark")
-
-    @staticmethod
-    def display_output(output):
-        print(output)
+    def get_input(text: str) -> str:
+        user_input = input(text)
+        #print(f"input is {user_input}.")
+        return user_input
