@@ -1,18 +1,13 @@
 from game import Game
-from game_action import GameAction
+from game_status import GameStatus
+
 
 def main():
-    game = Game()
-    action = game.play()
-    if action == GameAction.EXIT:
-        print("Exit the game")
-        return
-    elif action == GameAction.RESET:
-        print("Reset the game")
-        main()
-    else:
-        print("Unexpected action. Exit the game")
-        return
+    while True:
+        game = Game()
+        game.play()
+        if game.status == GameStatus.END:
+            break
 
 if __name__ == "__main__":
     main()
