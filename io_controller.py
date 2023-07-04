@@ -19,7 +19,7 @@ class Parser:
 
     @staticmethod
     def validate_action_format(input: str) -> bool:
-        pattern = r"[hre]"
+        pattern = r"[h]"
         return re.match(pattern, input, re.I)
 
 class IOController:
@@ -33,10 +33,12 @@ class IOController:
                     if 1 <= row <= 3 and 1 <= col <= 3:
                         return {'position': (row, col)}
                     else:
-                        print("Invalid input. Please enter the position in the range of '1 to 3'.")
+                        print("Invalid input. Enter the position in the range of '1 to 3'.")
+                    '''
                 elif Parser.validate_action_format(parsed_input):
                     return {'command': parsed_input}
+                    '''
                 else:
-                    print("Invalid input. Please input h for help.")
+                    print("Invalid input. Try again.")
             except Exception:
                 continue

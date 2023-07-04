@@ -2,5 +2,6 @@ from enum import Enum
 
 class GameMark(Enum):
     EMPTY = ' '
-    PLAYER1 = 'x'
-    PLAYER2 = 'o'
+    PLAYER_1 = 'o'
+    PLAYER_2 = 'x'
+

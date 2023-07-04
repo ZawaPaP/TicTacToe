@@ -1,13 +1,7 @@
-from game import Game
-from game_status import GameStatus
-
+from game_controller import GameController
 
 def main():
-    while True:
-        game = Game()
-        game.play()
-        if game.status == GameStatus.END:
-            break
+    GameController().start()
 
 if __name__ == "__main__":
     main()
