@@ -1,66 +1,59 @@
 from game import Game
-from board_renderer import GameBoardRenderer
 from game_rule import GameRule
-from console_io import ConsoleIO
-from enum import Enum
-
-
-
-class GameMode(Enum):
-    PVP = 1
-    VS_CPU = 2
-
+from io_controller import ConsoleIO
+from game_mode import GameMode
 
 class GameController:
-    FIRST_MOVE = 'PLAYER_1'
-    SECOND_MOVE = 'PLAYER_2'
-
     def start(self):
-        while True:
-            self.__play()
-            if not self.ask_continue():
-                break
-    
-    def __play(self): #play
-        game_mode = self.get_game_mode()
-        game = Game()
+        #while True:
+            mode = self.select_mode()
+            game = Game(mode)
+            game.play()
+        #    if not self.ask_continue():
+        #        break
+
+            
+    """
+    def play(self, players):
         self.display_initial_text(game)
+        game_rule = GameRule(game.board)
         while True:
-            #try:
+            try:
                 game.mark()
                 GameBoardRenderer(game.board).render()
-                if GameRule(game).is_over():
+                if game_rule.is_over():
                     break
                 game.switch_player()
-            # 想定するエラーだけ別定義して、処理を別にする
-            # Exception > str(e) > exit(1)
-            #except 
-            
-            #except Exception as e:
-            #    print(str(e))
-            #    exit(1)        
-        if GameRule(game).has_winner(): 
-            print(f"{game.turn.value} win")
+                
+            except ValueError or IndexError as e:
+                print(f"expected error {e}")
+            except Exception as e:
+                print(str(e))
+                exit(1)
+
+        if game_rule.has_winner(): 
+            print(f"{game.turn.name} win")
             return
-        elif GameRule(game).is_draw():
+        elif game_rule.is_draw():
             print("draw game")
             return
+    """
 
-    def get_game_mode(self) -> str:
+    def select_mode(self) -> GameMode:
+        """
         game_mode = [str(mode.name) +": "+ str(mode.value) for mode in GameMode]
-        return ConsoleIO.get_input(
+        user_input = ConsoleIO.get_input(int(
             str(game_mode) + "\n Select Game mode: "
-            )
+            ))
+        return GameMode(int(user_input))
+        """
+        return GameMode(3)
 
-    def set_game_mode(self, mode: int) -> GameMode:
-        return GameMode(mode)
-        
     @staticmethod
     def display_initial_text(game):
         print("TicTacToe Game START!\n")
-        print(f'{game.turn.value}\'s turn\n')
+        print(f'{game.turn.name}\'s turn')
         GameBoardRenderer(game.board).render()
-
 
     def ask_continue(self) -> bool:
         if self.is_confirmed_input("continue the new game? (y/n): "):
@@ -71,3 +64,4 @@ class GameController:
     def is_confirmed_input(text: str) -> bool:    
         confirmation = ConsoleIO.get_input(text)
         return confirmation.lower() == "y"
+

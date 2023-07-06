@@ -1,35 +1,33 @@
 from game_mark import GameMark
 
 class GameRule:
-    def __init__(self, game) -> None:
-        self.board = game.board
-
-    def is_over(self) -> bool:
-            if self.has_winner() or self.is_draw():
+    @staticmethod
+    def is_over(board) -> bool:
+            if GameRule.has_winner(board) or GameRule.is_draw(board):
                 return True
             return False
 
-    def has_winner(self) -> bool:
+    @staticmethod
+    def has_winner(board) -> bool:
         # row
-        for i in range(self.board.row()):
-            if (self.board.get_mark(i, 0) == self.board.get_mark(i, 1) == self.board.get_mark(i, 2)) and self.board.get_mark(i, 0) != GameMark.EMPTY.value:
+        for i in board.row_range():
+            if all(mark == board.get_mark(i, 1) and not board.is_empty(i, 1) for mark in board[i]):
                 return True
         # col
-        for j in range(self.board.column()):
-            if (self.board.get_mark(0, j) == self.board.get_mark(1, j) == self.board.get_mark(2, j)) and self.board.get_mark(0, j) != GameMark.EMPTY.value:
+        for j in board.column_range():
+            if all(mark == board.get_mark(1, j) and not board.is_empty(1, j) for mark in [board[i][j] for i in board.row_range()]):
                 return True
-
         # cross
-        if all(self.board.get_mark(i, i) == self.board.get_mark(0, 0) != GameMark.EMPTY.value for i in range(self.board.row())):
+        if all(mark == board.get_mark(1, 1) and not board.is_empty(1, 1) for mark in [board[i][i] for i in board.range_row()]):
             return True
             
-        if (self.board.get_mark(0, 2) == self.board.get_mark(1, 1) == self.board.get_mark(2, 0)) and self.board.get_mark(0, 2) != GameMark.EMPTY.value:
+        if all(mark == board.get_mark(1, 3) and not board.is_empty(1, 3) for mark in [board[i][board.row() + 1 - i] for i in board.range_row()]):
             return True
         return False
 
-    def is_draw(self) -> bool:
-        for i in range(self.board.row()):
-            for j in range(self.board.column()):
-                if self.board.get_mark(i, j) == GameMark.EMPTY.value:
+    def is_draw(board) -> bool:
+        for i in board.row_range():
+            for j in board.column_range():
+                if not board.is_empty(i, j):
                     return False
         return True

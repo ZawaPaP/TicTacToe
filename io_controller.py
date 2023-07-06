@@ -8,9 +8,8 @@ class Parser:
         try:
             input_str = input_str.replace(" ", "")
             return input_str
-        except Exception as e:
-            print(f"{str(e)}, invalid command. Please input h for help")
-            raise
+        except ValueError:
+            raise ValueError("Invalid input. Try again")
 
     @staticmethod
     def validate_position_format(input: str) -> bool:
@@ -23,22 +22,33 @@ class Parser:
         return re.match(pattern, input, re.I)
 
 class IOController:
-    def handle_input(self, text) -> dict:
+    @staticmethod
+    def get_input(prompt: str) -> str:
+        return ConsoleIO.get_input(prompt)
+
+    @staticmethod
+    def get_integer_input(prompt: str) -> int:
         while True:
             try:
-                user_input = ConsoleIO.get_input(text)
+                user_input = input(prompt)
+                value = int(user_input)
+                return value
+            except ValueError:
+                print("Invalid input. Please enter a valid integer.")
+
+    @staticmethod
+    def handle_input(prompt) -> dict:
+        while True:
+            try:
+                user_input = ConsoleIO.get_input(prompt)
                 parsed_input = Parser.parse_input(user_input)
                 if Parser.validate_position_format(parsed_input):
-                    row, col = map(int, parsed_input.split(","))
-                    if 1 <= row <= 3 and 1 <= col <= 3:
-                        return {'position': (row, col)}
+                    row, column = map(int, parsed_input.split(","))
+                    if 1 <= row <= 3 and 1 <= column <= 3:
+                        return row, column
                     else:
-                        print("Invalid input. Enter the position in the range of '1 to 3'.")
-                    '''
-                elif Parser.validate_action_format(parsed_input):
-                    return {'command': parsed_input}
-                    '''
+                        raise ValueError("Invalid input. Enter in the range of '1 to 3'.")
                 else:
-                    print("Invalid input. Try again.")
-            except Exception:
-                continue
+                    raise ValueError("Invalid input. Try again.")
+            except ValueError as e:
+                print(str(e))

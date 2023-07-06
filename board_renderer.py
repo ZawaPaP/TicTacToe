@@ -1,16 +1,17 @@
 class GameBoardRenderer:
     def __init__(self, board) -> None:
         self.board = board
+        
 
     def render(self) -> None:
-        for i in range(1, self.board.row() + 1):
-            for j in range(1, self.board.column() + 1):
+        for i in self.board.row_range():
+            for j in self.board.column_range():
                 if j != self.board.column():
                     print(f" {self.board.get_mark(i, j)} ", end = '|')
                 else:
                     print(f" {self.board.get_mark(i, j)} ")
             if i != self.board.row():
-                for k in range(1, self.board.column() + 1):
+                for k in self.board.column_range():
                     if k != self.board.column():
                         print("---", end = '+')
                     else:
