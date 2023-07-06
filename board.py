@@ -22,7 +22,7 @@ class GameBoard:
             self.board[row - 1][column - 1].mark = mark
         except IndexError:
             raise IndexError
-        
+
     def is_empty(self, row, column) -> bool:
         return self.board[row - 1][column - 1].mark == GameMark.EMPTY.value
 
@@ -32,11 +32,12 @@ class GameBoard:
     def empty_corner(self) -> int:
         pass
 
-
-    def row(self) -> int:
+    @staticmethod
+    def row() -> int:
         return GameBoard.ROW
 
-    def column(self) -> int:
+    @staticmethod
+    def column() -> int:
         return GameBoard.COLUMN
 
     def row_range(self) -> range:
@@ -47,3 +48,6 @@ class GameBoard:
 
     def get_center_position(self) -> int:
         return (self.row() + 1) // 2, (self.column() + 1) // 2
+
+    def get_row_mark(self, i) -> list:
+        return [mark for mark in [self.board[i - 1][j - 1].mark for j in self.column_range()]]

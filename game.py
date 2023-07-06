@@ -37,7 +37,7 @@ class Game:
             return
 
     def mark(self) -> None:
-        if PlayerManager.is_cpu():
+        if PlayerManager.is_cpu(self.turn):
             row, column = self.get_cpu_move()
         else:
             row, column = self.get_user_move()
