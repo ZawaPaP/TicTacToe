@@ -1,16 +1,39 @@
 from console_io import ConsoleIO
 import re
-from typing import Optional
-
-class Parser:
+from typing import Tuple
+class IOController:
     @staticmethod
-    def parse_input(input_str: str) -> Optional[str]:
-        try:
-            input_str = input_str.replace(" ", "")
-            return input_str
-        except Exception as e:
-            print(f"{str(e)}, invalid command. Please input h for help")
-            raise
+    def get_input(prompt: str) -> str:
+        return ConsoleIO.get_input(prompt)
+
+    @staticmethod
+    def get_integer_input(prompt: str) -> int:
+        while True:
+            try:
+                user_input = input(prompt)
+                value = int(user_input)
+                return value
+            except ValueError:
+                print("Invalid input. Please enter a valid integer.")
+
+    @staticmethod
+    def get_position_input(board, prompt) -> Tuple[int, int]:
+        while True:
+            user_input = ConsoleIO.get_input(prompt)
+            parsed_input = IOController.parse_input(user_input)
+            if IOController.validate_position_format(parsed_input):
+                row, column = map(int, parsed_input.split(","))
+                if IOController.validate_input_range(row, column, board):
+                    return row, column
+            else:
+                raise ValueError("Invalid input. Try again.")
+
+    @staticmethod
+    def  validate_input_range(row, column, board) -> bool:
+        if row in board.row_range() and column in board.column_range():
+            return True
+        else:
+            raise ValueError(f"Invalid input. Enter integer in the {board.row_range()}.") from None
 
     @staticmethod
     def validate_position_format(input: str) -> bool:
@@ -18,25 +41,9 @@ class Parser:
         return re.match(pattern, input)
 
     @staticmethod
-    def validate_action_format(input: str) -> bool:
-        pattern = r"[hre]"
-        return re.match(pattern, input, re.I)
-
-class IOController:
-    def handle_input(self, text) -> dict:
-        while True:
-            try:
-                user_input = ConsoleIO.get_input(text)
-                parsed_input = Parser.parse_input(user_input)
-                if Parser.validate_position_format(parsed_input):
-                    row, col = map(int, parsed_input.split(","))
-                    if 1 <= row <= 3 and 1 <= col <= 3:
-                        return {'position': (row, col)}
-                    else:
-                        print("Invalid input. Please enter the position in the range of '1 to 3'.")
-                elif Parser.validate_action_format(parsed_input):
-                    return {'command': parsed_input}
-                else:
-                    print("Invalid input. Please input h for help.")
-            except Exception:
-                continue
+    def parse_input(input_str: str) -> str:
+        try:
+            input_str = input_str.replace(" ", "")
+            return input_str
+        except ValueError:
+            raise ValueError("Invalid input. Try again")

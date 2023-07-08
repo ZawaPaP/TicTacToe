@@ -1,66 +1,51 @@
-from game_board import GameBoard
-from game_status import GameStatus
-from game_command import GameCommand
-from game_turn import Player
-from io_controller import IOController
+
+from board import GameBoard
 from board_renderer import GameBoardRenderer
-from game_command_handler import GameCommandHandler
+from player_manager import PlayerManager
 from game_rule import GameRule
-from game_mark import GameMark
-        
+from game_mode import GameMode
+from io_controller import IOController
 
 class Game:
     def __init__(self) -> None:
-        self.status = GameStatus.ONGOING
-        self.turn = Player.PLAYER_1
-        self.winner = None
-        self.board = GameBoard().initialize_board()
-        self.controller = IOController()
-        self.rule = GameRule(self.board)
+        self.game_mode = self.select_mode()
+        self.player_manager = PlayerManager(self.game_mode)
+        self.board = GameBoard()
 
-    def play(self) -> str:
+    def play(self):
+        self.player_manager.set_players()
+        self.display_initial_text()
+        while True:
+            try:
+                player = self.player_manager.get_current_player()
+                print(f"{player.get_name()}'s turn\n")
+                player.make_move(self.board)
+                GameBoardRenderer(self.board).render()
+                if GameRule.is_over(self.board):
+                    break
+                self.player_manager.move_to_next_player()
+                
+            except ValueError or IndexError as e:
+                print(str(e))
+                continue
+            #except Exception as e:
+            #    print(f"Unexpected Error {e}")
+            #    exit(1)
+
+        if GameRule.has_winner(self.board): 
+            print(f"{player.name} win")
+            return
+        elif GameRule.is_draw(self.board):
+            print("draw game")
+            return
+
+    def display_initial_text(self):
         print("TicTacToe Game START!\n")
-        print('Player 1\'s turn\n')
         GameBoardRenderer(self.board).render()
-        
-        while self.status == GameStatus.ONGOING:
-            input_data = self.controller.handle_input("Input the marking position 'row, column': ")
-            if 'position' in input_data:
-                try:
-                    self.make_move(input_data)
-                    GameBoardRenderer(self.board).render()
-                except ValueError as e:
-                    print(str(e))
-                    continue
-            elif 'command' in input_data:
-                self.make_action(input_data)
 
-            if self.rule.has_winner():
-                print(f"{self.turn} win")
-                self.status = GameStatus.END
-            elif self.rule.is_draw():
-                print("draw game")
-                self.status = GameStatus.END
-            else:
-                self.switch_player()
-
-
-    def make_move(self, input_data) -> None:
-        row, col = input_data['position']
-        if self.board[row - 1][col - 1] == GameMark.EMPTY.value:
-            player = self.turn
-            self.board[row - 1][col - 1] = player.value
-            print(f"{player} marked in {row}, {col}")
-        else:
-            raise ValueError("The position is already marked. Please choose an empty position.")
-
-    def make_action(self, input_data) -> None:
-        GameCommandHandler().game_command_handler(input_data['command'])
-
-    def switch_player(self):
-        if self.turn == Player.PLAYER_1:
-            self.turn = Player.PLAYER_2
-            print('Player 2\'s turn\n')
-        else:
-            self.turn = Player.PLAYER_1
-            print('Player 1\'s turn\n')
+    def select_mode(self) -> GameMode:
+        game_mode = [str(mode.name) +": "+ str(mode.value) for mode in GameMode]
+        user_input = IOController.get_integer_input(
+            str(game_mode) + "\n Select Game mode: "
+            )
+        return GameMode(int(user_input))
