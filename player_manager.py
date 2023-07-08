@@ -1,54 +1,61 @@
-from player import Player
-from player_type import PlayerType
+from player import Player, PlayerType
+from io_controller import IOController
 from game_mark import GameMark
+from game_mode import GameMode
 from typing import List
 
 class PlayerManager:
-    def __init__(self) -> None:
-        self.cpu_counter = 0
+    def __init__(self, game_mode: GameMode) -> None:
+        self.players = []
+        self.game_mode = game_mode
         self.game_marks = GameMark.get_game_marks()
+        self.number_of_user, self.number_of_cpu = GameMode.get_player_counts(game_mode)
+        self.number_of_players = self.number_of_cpu + self.number_of_user
+        self.get_current_player_index = 0
     
-    def get_players(self, player_types: List[PlayerType]) -> List[Player]:
-        players = []
-        for i in range(len(player_types)):
-            player = self.create_player(player_types[i])
-            player = self.assign_mark(i, player)
-            players.append(player)
-        return players
+    def set_players(self) -> List[Player]:
+        for i in range(self.number_of_user):        
+            player = self.create_player(i, PlayerType.USER)
+            self.players.append(player)
+        
+        for i in range(self.number_of_cpu):
+            player = self.create_player(i, PlayerType.CPU)
+            self.players.append(player)
 
-    def create_player(self, type: PlayerType) -> Player:
-        if type == PlayerType.CPU:
-            return self.create_cpu_player()
-        else:
-            return self.create_user_player()
+        if self.game_mode == GameMode.PVC:
+            if self.make_cpu_first_player():
+                self.players.reverse()
 
-    def create_cpu_player(self) -> Player:
-        self.cpu_counter += 1
-        cpu_name = f"CPU_{self.cpu_counter}"
-        return Player(cpu_name, PlayerType.CPU)
+    def get_current_player(self) -> Player:
+        return self.players[self.get_current_player_index % self.number_of_players]
 
-    def create_user_player(self, user_name) -> Player:
-        return Player(user_name, PlayerType.USER)
+    def move_to_next_player(self):
+        self.get_current_player_index += 1
 
-    def assign_mark(self, index, player: Player) -> Player:
+    def create_player(self, index, player_type: PlayerType) -> Player:
+        name = f"{player_type.name}_{index + 1}"
+        mark = self.get_available_mark()
+        return Player(name, mark, player_type)
+
+    def get_available_mark(self) -> str:
         try:
-            player.mark = self.game_marks[index]
-            return player
+            return self.game_marks.pop(0)
         except IndexError:
-            print("Not enough game marks.")
+            print("No available game marks.")
             exit(1)
 
     @staticmethod
-    def get_player_type(player: Player):
-        try:
-            return player.type
-        except IndexError:
-            raise IndexError("there is no player type")
-    
-    @staticmethod
-    def is_cpu(player: Player) -> bool:
-        return PlayerManager.get_player_type(player) == PlayerType.CPU
-
-    @staticmethod
-    def is_user(player: Player) -> bool:
-        return PlayerManager.get_player_type(player) == PlayerType.USER
+    def make_cpu_first_player() -> bool:
+        while True:
+            choice = IOController.get_integer_input(
+                """
+                Choose 1 for being the first player / Choose 2 for letting the CPU take the first turn.
+                Please enter your choice: 
+                """
+            )
+            if choice == 2:
+                return True
+            elif choice == 1:
+                return False
+            else:
+                print("Invalid choice. Please enter either 1 or 2.")

@@ -1,5 +1,3 @@
-from game_mark import GameMark
-
 class GameRule:
     @staticmethod
     def is_over(board) -> bool:
@@ -11,7 +9,7 @@ class GameRule:
     def has_winner(board) -> bool:
         # row
         for i in board.row_range():
-            if all(mark == board.get_mark(i, 1) and not board.is_empty(i, 1) for mark in board.get_row_mark(i)):
+            if all(mark == board.get_mark(i, 1) and not board.is_empty(i, 1) for mark in board.get_row_marks(i)):
                 return True
         # col
         for j in board.column_range():
