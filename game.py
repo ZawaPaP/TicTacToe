@@ -28,9 +28,9 @@ class Game:
             except ValueError or IndexError as e:
                 print(str(e))
                 continue
-            #except Exception as e:
-            #    print(f"Unexpected Error {e}")
-            #    exit(1)
+            except Exception as e:
+                print(f"Unexpected Error {e}")
+                exit(1)
 
         if GameRule.has_winner(self.board): 
             print(f"{player.name} win")
