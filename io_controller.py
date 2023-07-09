@@ -10,7 +10,7 @@ class IOController:
     def get_integer_input(prompt: str) -> int:
         while True:
             try:
-                user_input = input(prompt)
+                user_input = ConsoleIO.get_input(prompt)
                 value = int(user_input)
                 return value
             except ValueError:

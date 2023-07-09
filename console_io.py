@@ -1,4 +1,3 @@
-
 class ConsoleIO:
     @staticmethod
     def get_input(text: str) -> str:

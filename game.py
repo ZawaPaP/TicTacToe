@@ -28,6 +28,8 @@ class Game:
             except ValueError or IndexError as e:
                 print(str(e))
                 continue
+            except KeyboardInterrupt:
+                print("Game end")
             except Exception as e:
                 print(f"Unexpected Error {e}")
                 exit(1)
