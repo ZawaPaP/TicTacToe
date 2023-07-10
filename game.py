@@ -19,7 +19,12 @@ class Game:
             try:
                 player = self.player_manager.get_current_player()
                 print(f"{player.get_name()}'s turn\n")
-                player.make_move(self.board)
+                #player.make_move(self.board) 
+                row, column = player.get_mark_position(self.board)
+                if self.board.is_empty(row, column):
+                    self.board.set_mark(row, column, player.get_mark())
+                else:
+                    raise ValueError("The position is already marked. Please choose an empty cell.")
                 GameBoardRenderer(self.board).render()
                 if GameRule.is_over(self.board):
                     break
@@ -28,8 +33,6 @@ class Game:
             except ValueError or IndexError as e:
                 print(str(e))
                 continue
-            except KeyboardInterrupt:
-                print("Game end")
             except Exception as e:
                 print(f"Unexpected Error {e}")
                 exit(1)
@@ -46,8 +49,14 @@ class Game:
         GameBoardRenderer(self.board).render()
 
     def select_mode(self) -> GameMode:
-        game_mode = [str(mode.name) +": "+ str(mode.value) for mode in GameMode]
-        user_input = IOController.get_integer_input(
-            str(game_mode) + "\n Select Game mode: "
-            )
-        return GameMode(int(user_input))
+        while True:
+            try:
+                game_mode = [str(mode.name) +": "+ str(mode.value) for mode in GameMode]
+                user_input = IOController.get_integer_input(
+                    str(game_mode) + "\n Select Game mode: "
+                    )
+                mode_range = range(1, len(GameMode) + 1)
+                if IOController.validate_input_range(user_input, mode_range):
+                    return GameMode(int(user_input))
+            except ValueError as e:
+                print(str(e))
