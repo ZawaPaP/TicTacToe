@@ -28,7 +28,7 @@ NA
 --------
 ## Review
 
-* better to  separate get_move and set_move because set_move belong to Game
+* better to separate get_move and set_move because set_move belong to Game
     *  純粋関数 とはsame input / same outputかつ 関数の中身が変わらない関数のこと
     * 純粋関数以外はできるだけ避けるべき, make_moveはboardのstate変更をしてしまっているため、純粋関数ではない
     * set_moveはboard.set_moveにすれば、純粋関数になる
